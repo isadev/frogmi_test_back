@@ -9,7 +9,7 @@ require ::File.expand_path('../config/environment',  __FILE__)
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: 'storage/development.sqlite3')
 
 
-# TODO: extract this code to the model
+# TODO: extract this code to the model 
 load_ddbb = Earthquake.first.id == "ak02410bcznp8"
 puts  load_ddbb ? "Data previously exist, skip loading!" : ""
 
