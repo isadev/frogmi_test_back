@@ -10,10 +10,10 @@ ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: 'storage/d
 
 
 # TODO: extract this code to the model 
-load_ddbb = Earthquake.first.id == "ak02410bcznp8"
+load_ddbb = Earthquake.any?
 puts  load_ddbb ? "Data previously exist, skip loading!" : ""
 
-unless Earthquake.exists?(id: "ak0244or92hk")
+if not load_ddbb
   response = HTTParty.get('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson')
 
   if response.success?
@@ -24,10 +24,12 @@ unless Earthquake.exists?(id: "ak0244or92hk")
         feature['properties']['magType'].nil? and not feature['geometry']['coordinates'].nil? and not 
         feature['geometry']['coordinates'].empty? 
         {
+            type_of: feature["type"],
+            external_url: feature['properties']["detail"],
             place: feature['properties']['place'],
             magnitude: feature['properties']['mag'],
-            id: feature['id'],
-            external_id: feature['properties']['ids'],
+            external_id: feature['id'],
+            ids: feature['properties']['ids'],
             tsunami: feature['properties']['tsunami'],
             mag_type: feature['properties']['magType'],
             title: feature['properties']['title'],
