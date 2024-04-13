@@ -1,51 +1,63 @@
 require 'httparty'
 
 class ApiController < ApplicationController
-
   # before_action :review_params, only: [:show]
 
-  # 
   def features
-    apiResponse = HTTParty.get('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson')
+    max_page = (params[:per_page].present? and (params[:per_page] < 1000)) ? params[:per_page] : 10
+    page = params[:page] ? params[:page] : 1
     
-    #
-    # for feature in apiResponse.data.features
-    #   # if ()
-    # end
     
+    # instance variable to handle in the view and to access to other attr, like has_next_page
+    earthquakeQuery = Earthquake.all
+    
+    if params[:mag_types].present?
+      mag_types = [params[:mag_types]] unless mag_types.is_a?(Array) # Convertir a un arreglo si no lo es
+      earthquakeQuery = earthquakeQuery.where(mag_type: mag_types)
+    end
+    
+    @earthquakes = earthquakeQuery.paginate(page: page, per_page: max_page)
 
-    if apiResponse.success?
-      data = JSON.parse(apiResponse.body)
-      feature = data['features'][0]
-
-      feature['properties']['title'] = nil
-      feature['properties']['url'] = nil
-      feature['geometry']['coordinates'] = []
-      
-      if feature['properties']['title'].nil? or feature['properties']['url'].nil? or 
-        feature['properties']['magType'].nil? or feature['geometry']['coordinates'].nil? or 
-        feature['geometry']['coordinates'].empty?
-        
-        puts "es nulo o vacio"
+    if @earthquakes.any?
+      data_from_ddbb = @earthquakes.map do |earthquake|
+        {
+          "id": earthquake.id,
+          "type": earthquake.type_of,
+          "attributes": {
+            "external_url": earthquake.external_url,
+            "external_id": earthquake.external_id,
+            "magnitude": earthquake.magnitude,
+            "place": earthquake.place,
+            "time": earthquake.time,
+            "tsunami": earthquake.tsunami,
+            "mag_type": earthquake.mag_type,
+            "title": earthquake.title,
+            "coordinates": {
+              "longitude": earthquake.longitude,
+              "latitude": earthquake.latitude
+            }
+          }
+        }
       end
 
-      # Imprimimos la información del primer feature
-      puts "Place: #{feature['properties']['place']}"
-
-      render json: { data: "ok", params: params,  features: data['features']}
-      # render json: { data: data?.features[0], params: params }
+      prev_page = @earthquakes.current_page > 1 ? @earthquakes.current_page - 1 : nil
+      render json: { 
+        data: data_from_ddbb, 
+        total_pages: @earthquakes.total_pages,
+        current_page: @earthquakes.current_page,
+        next_page: @earthquakes.next_page,
+        prev_page: prev_page,
+        total_entries: @earthquakes.total_entries
+      }
     else
-      render json: { error: 'Failed to fetch data from USGS' }, status: :unprocessable_entity
+      render json: { error: "No data found" }, status: :not_found
     end
+
   end
 
 
   private
     def review_params
-      # ...
-    end
-
-    def task_params
       # ...
     end
 end

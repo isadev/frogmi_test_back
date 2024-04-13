@@ -48,3 +48,5 @@ rails generate model Earthquake id:string external_id:string magnitude:float pla
 
 execute migration
 rails db:migrate
+
+the foreign key are handled like any other orm with the relations of belongs_to o has_many an so on, the only thing to do is to join both tables with the same name of the foreign_key
