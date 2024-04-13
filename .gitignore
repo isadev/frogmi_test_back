@@ -70,7 +70,6 @@ build-iPhoneSimulator/
 ## Environment normalization:
 /.bundle/
 /vendor
-/tmp
 /bin
 config/credentials.yml.enc
 /vendor/bundle
