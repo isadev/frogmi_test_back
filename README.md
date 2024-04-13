@@ -56,3 +56,7 @@ back a migration
 rails db:rollback
 
 the foreign key are handled like any other orm with the relations of belongs_to o has_many an so on, the only thing to do is to join both tables with the same name of the foreign_key
+
+to execute a task,
+rake db:load_earthquakes
+the "namespace :db" its only to organize the task when exists many, its not necessary to use a "namespace :x" but its a good practice
