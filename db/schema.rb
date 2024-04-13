@@ -10,8 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_11_025806) do
-  create_table "earthquakes", id: false, force: :cascade do |t|
+ActiveRecord::Schema[7.1].define(version: 2024_04_13_003649) do
+  create_table "comments", force: :cascade do |t|
+    t.text "content"
+    t.integer "feature_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "earthquakes", force: :cascade do |t|
     t.string "external_url"
     t.string "type_of"
     t.string "external_id"

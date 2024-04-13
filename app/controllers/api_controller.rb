@@ -1,19 +1,18 @@
 require 'httparty'
 
 class ApiController < ApplicationController
-  # before_action :review_params, only: [:show]
 
   def features
-    max_page = (params[:per_page].present? and (params[:per_page] < 1000)) ? params[:per_page] : 2
-    page = params[:page] ? params[:page] : 1
+    max_page = (params[:per_page].present? and (params[:per_page].to_i < 1000)) ? params[:per_page].to_i : 10
+    page = params[:page] ? params[:page].to_i : 1
     
     
     # instance variable to handle in the view and to access to other attr, like has_next_page
     earthquakeQuery = Earthquake.all
     
-    if params[:mag_types].present?
-      mag_types = [params[:mag_types]] unless mag_types.is_a?(Array) # Convertir a un arreglo si no lo es
-      earthquakeQuery = earthquakeQuery.where(mag_type: mag_types)
+    if params[:mag_type].present?
+      mag_type = [params[:mag_type]] unless mag_type.is_a?(Array) # Converter to an array if it is not one
+      earthquakeQuery = earthquakeQuery.where(mag_type: mag_type)
     end
     
     @earthquakes = earthquakeQuery.paginate(page: page, per_page: max_page)
@@ -55,9 +54,35 @@ class ApiController < ApplicationController
 
   end
 
+  def new_comment
+    earthquake = Earthquake.find(params[:id])
 
-  private
-    def review_params
-      # ...
+    if request.body.read.empty?
+      render json: { error: "Comments need a body" }, status: :forbidden
+      return
     end
+
+    comment_data = JSON.parse(request.body.read)
+
+    if earthquake.nil?
+      render json: { error: "No data found" }, status: :not_found
+      return
+    end
+
+
+    if comment_data.nil? or comment_data["body"].nil? or comment_data["body"].empty?
+      render json: { error: "Comments cannot be empty" }, status: :forbidden
+      return
+    end
+    
+    comment = earthquake.comments.build(content: comment_data["body"])
+
+    if comment.save
+      render json: comment, status: :created
+    else
+      render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
+    end
+
+  end
+
 end
