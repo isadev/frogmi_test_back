@@ -23,6 +23,9 @@ Things you may want to cover:
 
 - ...
 
+CAUTION:
+the folder tmp pids have to exist always to let puma run
+
 creation of ruby app:
 rails new frogmi-api-project --api
 
