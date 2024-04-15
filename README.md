@@ -1,58 +1,45 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
+This README document steps are necessary to get the
 application up and running.
 
 Things you may want to cover:
 
 - Ruby version
 
+        ruby 3.0.0p0 (2020-12-25 revision 95aff21468)
+
 - System dependencies
 
+        None
+
 - Configuration
+-       Not needed
 
 - Database creation
 
+        Not needed this project work with migrations
+
 - Database initialization
+
+        rails db:migrate
 
 - How to run the test suite
 
-- Services (job queues, cache servers, search engines, etc.)
+        Not added yet
 
-- Deployment instructions
+- Deployment instructions (in this order):
 
-- ...
+        bundle install
 
-CAUTION:
-the folder tmp pids have to exist always to let puma run
+        rake db:load_earthquakes
 
-creation of ruby app:
-rails new frogmi-api-project --api
+        rackup -p 3000
 
-download new libs/module
-gem install x
+- **CAUTION**
 
-install lib
-bundle install
+The port can be change, but the front side must exist in the port 3001
+Cors are activated and this project only accept request from http://localhost:3001
+If the frontend port has to be changed, go to this file:
 
-execute a ruby console with rails
-rails c
-
-run your app in rails without rack
-rails server
-
-run yur app with rack but not using puma as server
-rackup -p 3000
-
-generate migration to ddbb
-rails generate model <model> <attr_name>:<data_type>
-example
-rails generate model Earthquake id:string external_id:string magnitude:float place:string time:string tsunami:boolean mag_type:string title:string longitude:float latitude:float
-
-execute migration
-rails db:migrate
-
-back a migration
-rails db:rollback
-
-the foreign key are handled like any other orm with the relations of belongs_to o has_many an so on, the only thing to do is to join both tables with the same name of the foreign_key
+        config/initializers/cors.rb
